@@ -30,14 +30,18 @@ def index(request):
         "auth": request.user.is_authenticated,
         "p": pr,
         "cat": cat,
-        "subcat": subcat
+        "subcat": subcat,
+        "title": "Homepage",
+        "name": request.user.username
     }
     if request.user.is_authenticated:
             return render(request, 'store_app/index.html', context)
     return render(request, 'store_app/auth_error.html', context)
 
 def login_view(request):
-    context = {'error': False}
+    context = {'error': False,
+               "title": "Login",
+               "auth": request.user.is_authenticated}
     if request.method == "POST":
         context['error'] = "Login o password non corrette"
         user = authenticate(username=request.POST.get("username"),
@@ -52,12 +56,18 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    context = {}
-    return render(request, 'store_app/login.html', context)
+    context = {"auth": request.user.is_authenticated}
+    return redirect('/')
+    # return render(request, 'store_app/login.html', context)
 
 
 def register(request):
-    return render(request, 'store_app/register.html')
+    context = {
+        "name": request.user.username
+        }
+    if request.method == 'POST':
+        print('\n\n', request.POST.dict)
+    return render(request, 'store_app/register.html', context)
 
 
 
