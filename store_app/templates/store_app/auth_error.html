@@ -1,0 +1,35 @@
+{% extends "store_app/base.html" %}
+{% block content %}
+        <br><br>
+        <figure class="text-center">
+            <blockquote class="blockquote">
+                <p>Non sei authorizzato a visualizzare questa pagina fai <i> login </i> o <i> registrati </i></p>
+            </blockquote>
+            <figcaption class="blockquote-footer">
+                Someone famous in <cite title="Source Title">Source Title</cite>
+            </figcaption>
+        </figure>
+        <br><br>
+
+        <form  action="{% url 'login' %}">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <button class="btn btn-primary" type="submit"  action="{% url 'login' %}">
+
+                    Login
+                </button>
+
+            </div>
+        </form>
+        <br>
+        <form  action="{% url 'register' %}">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <button class="btn btn-primary" type="submit"  action="{% url 'login' %}">
+
+                    Register
+                </button>
+
+            </div>
+        </form>
+        {% endblock %}
+    
+

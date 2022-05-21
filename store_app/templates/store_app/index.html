@@ -1,0 +1,70 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>indexpage</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+        <title>Hello, world!</title>
+    {% comment %} <link rel="stylesheet" href="{% static 'css/index.css'%}" type="text/css"> {% endcomment %}
+</head>
+
+    <body class="p-3 mb-2 bg-secondary text-white">
+
+
+
+        {% if auth %}
+            <hr>
+            <form method="POST" action="{% url 'index' %}" class="position-absolute top-50 start-50 translate-middle">
+                {% csrf_token %} 
+
+                <select name="cat" class="form-select" aria-label="Default select example" style="width: 400px;">
+                    <option selected>{{ cat.first.name }}</option>
+                    {% for ct in cat %}
+                        <option name="cat">  {{ ct.name }}  </option>
+                    {% endfor %}
+                </select>
+                <br>
+
+                <select name="subcategory" class="form-select" aria-label="Default select example" style="width: 400px;">
+                    <option selected>{{ subcat.first.name }}</option>
+                    {% for ct in subcat %}
+                    <option name="subcategory">  {{ ct.name }}  </option>
+                    {% endfor %}
+
+                </select>
+                <br>
+
+                <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Name</span>
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="name" >
+                </div>
+                <input type="submit" value="Inserisci" class="form-control">
+            </form>
+            <a href="{% url 'logout' %}">
+                <h2 class="text-white">Logout</h2>
+            </a>
+            <hr class="position-absolute top-100 start-50 translate-middle">
+            <hr>
+        {% else %}
+            <h2> Non sei authorizzato </h2>
+            <br>
+            <a href="{% url 'login' %}">
+                <h2 class="text-white">Login</h2>
+            </a>
+
+        
+        {% endif %}
+
+
+    </body>
+</html>
