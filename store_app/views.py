@@ -2,6 +2,7 @@ from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from utils import debug_
 
 from .models import (
     Customer,
@@ -12,8 +13,9 @@ from .models import (
 )
 
 
+
 def index(request):
-    print(request.COOKIES)
+    debug_(request.COOKIES)
     pr = Product.objects.all()
     cat = Category.objects.all()
     subcat = SubCategory.objects.all()
@@ -66,7 +68,11 @@ def register(request):
         "name": request.user.username
         }
     if request.method == 'POST':
-        print('\n\n', request.POST.dict)
+        debug_(request.POST.dict)
+        
+        
+        
+        
     return render(request, 'store_app/register.html', context)
 
 
