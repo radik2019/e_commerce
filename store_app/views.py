@@ -13,24 +13,15 @@ from .models import (
 )
 
 
-
 def index(request):
-    debug_(request.COOKIES)
-    pr = Product.objects.all()
+    pr = [i for i in Product.objects.all()]
     cat = Category.objects.all()
     subcat = SubCategory.objects.all()
-    if request.method == "POST":
-        rqst = request.POST
-
-        Product.objects.create(
-            name=rqst.get('name'),
-            category=Category.objects.get(name=rqst.get('cat')),
-            sub_cat=SubCategory.objects.get(name=rqst.get('subcategory'))
-        )
-        print(Product.objects.all())
+    debug_(pr)
     context = {
         "auth": request.user.is_authenticated,
-        "p": pr,
+        "user": request.user,
+        "pr": pr,
         "cat": cat,
         "subcat": subcat,
         "title": "Homepage",
@@ -40,10 +31,42 @@ def index(request):
             return render(request, 'store_app/index.html', context)
     return render(request, 'store_app/auth_error.html', context)
 
+
+
+def add_prod(request):
+    pr = Product.objects.all()
+    cat = Category.objects.all()
+    subcat = SubCategory.objects.all()
+    if request.method == "POST":
+        rqst = request.POST
+
+        pp = Product.objects.create(
+            name=rqst.get('name'),
+            category=Category.objects.get(name=rqst.get('cat')),
+            sub_cat=SubCategory.objects.get(name=rqst.get('subcategory'))
+        )
+        debug_(pp)
+    context = {
+        "auth": request.user.is_authenticated,
+        "user": request.user,
+        "p": pr,
+        "cat": cat,
+        "subcat": subcat,
+        "title": "Homepage",
+        "name": request.user.username
+    }
+    if request.user.is_authenticated:
+            return render(request, 'store_app/insert_data.html', context)
+    return render(request, 'store_app/auth_error.html', context)
+
+
 def login_view(request):
-    context = {'error': False,
-               "title": "Login",
-               "auth": request.user.is_authenticated}
+    context = {
+        'error': False,
+        "title": "Login",
+        "auth": request.user.is_authenticated,
+        "message":"",               
+    }
     if request.method == "POST":
         context['error'] = "Login o password non corrette"
         user = authenticate(username=request.POST.get("username"),
@@ -51,8 +74,8 @@ def login_view(request):
         if user is not None:
             
             login(request, user)
+            debug_(User.objects.all() ,user.password)
             return redirect('/')
- 
         return render(request, "store_app/login.html", context)
     return render(request, "store_app/login.html", context)
 
@@ -63,17 +86,52 @@ def logout_view(request):
     # return render(request, 'store_app/login.html', context)
 
 
-def register(request):
+def register_user(request):
     context = {
-        "name": request.user.username
+        "name": request.user.username,
+        "message": '',
+        "auth": request.user.is_authenticated,
+        "user": request.user,
         }
+
     if request.method == 'POST':
-        debug_(request.POST.dict)
-        
-        
-        
-        
+        name = request.POST.get("username")
+        email = request.POST.get("email")
+        password1 = request.POST.get("password1")
+        password2 = request.POST.get("password2")
+        if name  and email and (password1 == password2):
+            user = User.objects.create_user(name, email, password1)
+            context['message'] = "Registrazione andata a buon fine"
+            return render(request, 'store_app/register.html', context)
+        context['message'] = "tutti i campi sono obbligatori e le password devono coincidere"
+        return render(request, 'store_app/register.html', context)
     return render(request, 'store_app/register.html', context)
+
+
+
+def register_superuser(request):
+    context = {
+        "title": "Register Superuser",
+        "name": request.user.username,
+        "message": '',
+        "auth": request.user.is_authenticated,
+        # "user": request.user,
+        }
+
+    if request.method == 'POST':
+        name = request.POST.get("username")
+        email = request.POST.get("email")
+        password1 = request.POST.get("password1")
+        password2 = request.POST.get("password2")
+        if name  and email and (password1 == password2):
+            user = User.objects.create_superuser(name, email, password1)
+            context['message'] = "Registrazione andata a buon fine"
+            return render(request, 'store_app/register.html', context)
+        context['message'] = "tutti i campi sono obbligatori e le password devono coincidere"
+        return render(request, 'store_app/register.html', context)
+    return render(request, 'store_app/register.html', context)    
+        
+        
 
 
 

@@ -15,7 +15,7 @@ def debug_(*args):
     for i in args:
         print(f"\033[35m\33[1m\033[3m {i}")
     line()
-    reset()
+
 
 
 

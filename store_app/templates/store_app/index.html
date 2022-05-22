@@ -1,46 +1,48 @@
-
 {% extends "store_app/base.html" %}
 {% block content %}
 
-        {% if auth %}
-            <hr>
-            <form method="POST" action="{% url 'index' %}" class="position-absolute top-50 start-50 translate-middle">
-                {% csrf_token %} 
+    {% if auth %}
+    <br><br>
+    <h2 class="position-absolute top-40 start-50 translate-middle">Lista dei dati</h2>
+    <br><br>
+        <table class="table table-striped table-hover">
 
-                <select name="cat" class="form-select" aria-label="Default select example" style="width: 400px;">
-                    <option selected>{{ cat.first.name }}</option>
-                    {% for ct in cat %}
-                        <option name="cat">  {{ ct.name }}  </option>
-                    {% endfor %}
-                </select>
-                <br>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Sub Category</th>
+                </tr>
+            </thead>
 
-                <select name="subcategory" class="form-select" aria-label="Default select example" style="width: 400px;">
-                    <option selected>{{ subcat.first.name }}</option>
-                    {% for ct in subcat %}
-                    <option name="subcategory">  {{ ct.name }}  </option>
-                    {% endfor %}
+            <tbody>
+                {% for i in pr %}
+                    <tr class="mb-3">
+                        
+                        <th scope="row">1</th>
+                        {% comment %} <td> <a href="{% url 'login' %} style="display:block;">&nbsp;">{{ i.name }}</a></td> {% endcomment %}
+                        <td><a href="{% url 'login' %}" style="display:block;">&nbsp; {{ i.name }} </a></td>
+                        <td>{{ i.category.name }}</td>
+                        <td>{{ i.sub_cat.name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
 
-                </select>
-                <br>
+        </table>
 
-                <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
-                    <span class="input-group-text" id="inputGroup-sizing-default">Name</span>
-                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="name" >
-                </div>
-                <input type="submit" value="Inserisci" class="form-control">
-            </form>
+    {% else %}
+        <h2> Non sei authorizzato </h2>
+        <br>
+        <a href="{% url 'login' %}" ">
+            <h2 class="text-white">Login</h2>
+        </a>
+    {% endif %}
 
-            <hr class="position-absolute top-100 start-50 translate-middle">
-            <hr>
-        {% else %}
-            <h2> Non sei authorizzato </h2>
-            <br>
-            <a href="{% url 'login' %}">
-                <h2 class="text-white">Login</h2>
-            </a>
-        {% endif %}
+
+
+
+
+
 
 {% endblock %}
-
-
