@@ -1,8 +1,10 @@
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from utils import debug_
+
 
 from .models import (
     Customer,
@@ -79,11 +81,11 @@ def login_view(request):
         return render(request, "store_app/login.html", context)
     return render(request, "store_app/login.html", context)
 
+
 def logout_view(request):
     logout(request)
     context = {"auth": request.user.is_authenticated}
     return redirect('/')
-    # return render(request, 'store_app/login.html', context)
 
 
 def register_user(request):
@@ -92,6 +94,7 @@ def register_user(request):
         "message": '',
         "auth": request.user.is_authenticated,
         "user": request.user,
+        "reg_type": "register"
         }
 
     if request.method == 'POST':
@@ -110,11 +113,14 @@ def register_user(request):
 
 
 def register_superuser(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied()
     context = {
         "title": "Register Superuser",
         "name": request.user.username,
         "message": '',
         "auth": request.user.is_authenticated,
+        "reg_type": "registersuperuser"
         # "user": request.user,
         }
 
@@ -134,5 +140,24 @@ def register_superuser(request):
         
 
 
+def all_users(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied()
+    u = User.objects.all()
+    
+    
+
+    context = {
+    "title": "Allusers",
+    "name": request.user.username,
+    "message": '',
+    "auth": request.user.is_authenticated,
+    "reg_type": "registersuperuser",
+    "user": request.user,
+    "users": u,
+    }
+
+    return render(request, "store_app/allusers.html", context)
+    
 
 

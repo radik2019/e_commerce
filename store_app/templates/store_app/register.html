@@ -2,8 +2,12 @@
 {% extends "store_app/base.html" %}
 {% block content %}
 
-
+{% if user.is_superuser %}
+<form method="POST" action="{% url 'registersuperuser' %}" >
+{% else %}
 <form method="POST" action="{% url 'register' %}" >
+{% endif %}
+
         <br><br>
                 {% csrf_token %} 
         <div class="row-5 mb-4 ">
@@ -36,8 +40,8 @@
               </div>
 
         <button type="submit" class="btn btn-primary">Sign in</button>
-      </form>
-      <p>{{ message }}</p>
+</form>
+
 
 {% endblock %}
 

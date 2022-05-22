@@ -1,0 +1,19 @@
+{% extends "store_app/base.html" %}
+{% block content %}
+
+<h2> List of all users </h2>
+<hr>
+{% for user in users %}
+    <p>{{user.get_username}}</p>
+    <p> {{ user.email}} </p>
+    <p> Is superuser:  {{ user.is_superuser }} </p>
+    <p>Is autenticated {{ user.is_authenticated }}</p>
+    <p> Last login {{ user.last_login}} </p>
+    <p> Is active :{{ user.is_active}} </p>
+    <p> Is staff: {{ user.is_staff}} </p>
+    <p> Was created: {{ user.date_joined}} </p>
+    <p> Is staff {{ user.is_staff}} </p>
+    <hr>
+{% endfor %}
+
+{% endblock %}
