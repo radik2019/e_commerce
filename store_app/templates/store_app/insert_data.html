@@ -7,13 +7,16 @@
         <form method="POST" action="{% url 'addprod' %}" class="position-absolute top-50 start-50 translate-middle">
             {% csrf_token %} 
             <h1> Insert product data</h1>
+            
             <select name="cat" class="form-select" aria-label="Default select example" style="width: 400px;">
                 <option selected>{{ cat.first.name }}</option>
                 {% for ct in cat %}
                     <option name="cat">  {{ ct.name }}  </option>
                 {% endfor %}
             </select>
+
             <br>
+
 
             <select name="subcategory" class="form-select" aria-label="Default select example" style="width: 400px;">
                 <option selected>{{ subcat.first.name }}</option>
@@ -22,12 +25,59 @@
                 {% endfor %}
 
             </select>
+
             <br>
+
 
             <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
                 <span class="input-group-text" id="inputGroup-sizing-default">Name</span>
-                <input  value="{{ Ciiiiiiiii }}" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="name" >
+                <input type="text" class="form-control" aria-label="Sizing example input" 
+                aria-describedby="inputGroup-sizing-default" name="name" >
             </div>
+
+            <br>
+
+            
+            <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
+                <span class="input-group-text" id="inputGroup-sizing-default">Avaiability</span>
+                <input type="text" min="0" class="form-control" aria-label="Sizing example input" 
+                aria-describedby="inputGroup-sizing-default" name="avaiability" >
+            </div>
+
+            <br>
+
+            
+            <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
+                <span class="input-group-text" id="inputGroup-sizing-default">Price</span>
+                <input input type="number" min="0" step="0.01" class="form-control" aria-label="Sizing example input" 
+                aria-describedby="inputGroup-sizing-default" name="price" >
+            </div>
+
+
+
+            <br>
+
+            
+            <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
+                <span class="input-group-text" id="inputGroup-sizing-default">Product Code</span>
+                <input type="text" class="form-control" aria-label="Sizing example input" 
+                aria-describedby="inputGroup-sizing-default" name="code_product" >
+            </div>
+
+
+            <br>
+
+            
+            <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
+                <span class="input-group-text" id="inputGroup-sizing-default">Discount</span>
+                <input type="number" step="0.01" min="0" class="form-control" aria-label="Sizing example input" 
+                aria-describedby="inputGroup-sizing-default" name="discount" >
+            </div>
+
+
+
+
+
             <input type="submit" value="Inserisci" class="form-control">
         </form>
 

@@ -14,6 +14,12 @@
                     <th scope="col">Name</th>
                     <th scope="col">Category</th>
                     <th scope="col">Sub Category</th>
+
+                    <th scope="col">Avaiability</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Product Code</th>
+                    <th scope="col">Discount</th>
+                    
                 </tr>
             </thead>
 
@@ -23,10 +29,15 @@
                         
                         <th scope="row">1</th>
                         <th scope="row">{{ i.pk }}</th>
-                        {% comment %} <td> <a href="{% url 'login' %} style="display:block;">&nbsp;">{{ i.name }}</a></td> {% endcomment %}
                         <td><a href="{% url 'index' %}{{ i.pk }}/" style="display:block; color:#000000;" name="mylist">&nbsp; {{ i.name }} </a></td>
                         <td>{{ i.category.name }}</td>
                         <td>{{ i.sub_cat.name }}</td>
+
+                        <td>{{ i.avaiability }}</td>
+                        <td>{{ i.price }}</td>
+                        <td>{{ i.code_product }}</td>
+                        <td>{{ i.discount }}</td>
+
                     </tr>
                 {% endfor %}
             </tbody>

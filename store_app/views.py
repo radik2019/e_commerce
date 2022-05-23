@@ -14,6 +14,16 @@ from .models import (
 )
 
 
+
+def auth_superuser(func):
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return render(request, "store_app/message.html", {"message": "error 403 Accesso negato!!"})
+            raise PermissionDenied("accesso negato")
+        return func(request, *args, **kwargs)
+    return wrapper
+
+
 def get_mycontext(request):
     context = {
     "title": "",
@@ -27,11 +37,9 @@ def get_mycontext(request):
 
 
 def index(request):
-    debug_(request.GET.dict(), request.POST.dict())
     pr = [i for i in Product.objects.all()]
     cat = Category.objects.all()
     subcat = SubCategory.objects.all()
-    debug_(pr)
     context = {
         "auth": request.user.is_authenticated,
         "user": request.user,
@@ -46,7 +54,7 @@ def index(request):
     return render(request, 'store_app/auth_error.html', context)
 
 
-
+@auth_superuser
 def modifie_product(request, my_id):
     
     context = get_mycontext(request)
@@ -63,6 +71,11 @@ def modifie_product(request, my_id):
             product.name = request.POST.get("name")
             product.category = Category.objects.get(name=request.POST.get("cat"))
             product.sub_cat = SubCategory.objects.get(name=request.POST.get("subcategory"))
+            product.price = request.POST.get("price")
+            product.avaiability = request.POST.get("avaiability")
+            product.code_product = request.POST.get("code_product")
+            product.discount = request.POST.get("discount")
+            
             product.save()
             context["message"] = "Le modifiche sono state salvate con successo"
             
@@ -81,7 +94,11 @@ def add_prod(request):
         pp = Product.objects.create(
             name=rqst.get('name'),
             category=Category.objects.get(name=rqst.get('cat')),
-            sub_cat=SubCategory.objects.get(name=rqst.get('subcategory'))
+            sub_cat=SubCategory.objects.get(name=rqst.get('subcategory')),
+            discount = rqst.get('discount'),
+            code_product = rqst.get('code_product'),
+            price = rqst.get('price'),
+            avaiability = rqst.get('avaiability'),
         )
 
     context = get_mycontext(request)
@@ -91,6 +108,7 @@ def add_prod(request):
     if request.user.is_authenticated:
             return render(request, 'store_app/insert_data.html', context)
     return render(request, 'store_app/auth_error.html', context)
+
 
 def login_view(request):
     context = get_mycontext(request)
@@ -131,6 +149,7 @@ def register_user(request):
         return render(request, 'store_app/register.html', context)
     return render(request, 'store_app/register.html', context)
 
+
 def register_superuser(request):
     if not request.user.is_superuser:
         raise PermissionDenied()
@@ -155,10 +174,10 @@ def all_users(request):
         raise PermissionDenied()
     context = get_mycontext(request)
     context["title"] = "Allusers"
-    context["user"] = User.objects.all()
+    context["users"] = User.objects.all()
     return render(request, "store_app/allusers.html", context)
-    
 
+# @auth_superuser
 def detail_product(request, my_id):
     context = get_mycontext(request)
     context["title"] = "Detail Product"
@@ -169,7 +188,7 @@ def detail_product(request, my_id):
 
 def remove_detail(request, my_id):
     context = get_mycontext(request)
-    debug_(context)
+
     try:
         Product.objects.get(pk=my_id).delete()
         context['message'] = "prodotto rimosso"
