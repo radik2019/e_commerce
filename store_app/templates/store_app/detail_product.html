@@ -1,0 +1,33 @@
+
+
+{% extends "store_app/base.html" %}
+{% block content %}
+    <h2 style="text-align:center;"> Product detail</h2>
+    <br>
+    <p style="text-align:center;"> ID: <strong style="color:#ccff66;font-size:150%;">{{ product.id }} </strong></p>
+    <p style="text-align:center;"> Nome: <strong style="color:#ccff66;font-size:150%;">{{ product.name }}</strong> </p>
+    <p style="text-align:center;"> Category: <strong style="color:#ccff66;font-size:150%;">{{ product.category.name }} </strong> </p>
+    <p style="text-align:center;"> SubCategory: <strong style="color:#ccff66;font-size:150%;">{{ product.sub_cat.name }}</strong> </p>
+    <br>
+
+
+
+    {% if user.is_superuser %}
+
+        <form method="POST" class="row g-3">
+            {% csrf_token %}
+            <button formaction="{% url 'index' %}{{ product.id }}/del/" type="submit"  class="btn btn-outline-light w-25">Remove Product</button>
+        </form>
+            <br>
+        <form method="POST" class="row g-3">
+            {% csrf_token %}
+            <button formaction="{% url 'index' %}{{ product.id }}/mod/" type="submit"  class="btn btn-outline-light w-25">Modifi product</button>
+        </form>
+    
+    {% endif %}
+    
+{% endblock %}
+
+
+
+

@@ -13,6 +13,10 @@ urlpatterns = [
     path('registersuperuser/', register_superuser, name='registersuperuser'),
     path('addprod/', add_prod, name='addprod'),
     path('allusers/', all_users, name='allusers'),
+    path('<int:my_id>/del/', remove_detail,),
+    path('<int:my_id>/', detail_product,),
+    path('<int:my_id>/', detail_product,),
+    path('<int:my_id>/mod/', modifie_product,),
 ]
 
 

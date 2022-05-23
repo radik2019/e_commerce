@@ -3,9 +3,8 @@ from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.core.exceptions import ObjectDoesNotExist
 from utils import debug_
-
-
 from .models import (
     Customer,
     Cart,
@@ -15,7 +14,20 @@ from .models import (
 )
 
 
+def get_mycontext(request):
+    context = {
+    "title": "",
+    "name": request.user.username,
+    "message": '',
+    "auth": request.user.is_authenticated,
+    "reg_type": "registersuperuser",
+    "user": request.user
+    }
+    return context
+
+
 def index(request):
+    debug_(request.GET.dict(), request.POST.dict())
     pr = [i for i in Product.objects.all()]
     cat = Category.objects.all()
     subcat = SubCategory.objects.all()
@@ -35,40 +47,55 @@ def index(request):
 
 
 
+def modifie_product(request, my_id):
+    
+    context = get_mycontext(request)
+    context["p"] = Product.objects.all()
+    context["cat"] = Category.objects.all()
+    context["subcat"] = SubCategory.objects.all()
+
+    try:
+        product = Product.objects.get(pk=my_id)
+        context['message'] = "prodotto aggiornato"
+        context["product"] = product
+        context["nm"] = product.name
+        if request.method == "POST":
+            product.name = request.POST.get("name")
+            product.category = Category.objects.get(name=request.POST.get("cat"))
+            product.sub_cat = SubCategory.objects.get(name=request.POST.get("subcategory"))
+            product.save()
+            context["message"] = "Le modifiche sono state salvate con successo"
+            
+            return render(request, "store_app/message.html", context)
+            
+    except ObjectDoesNotExist:
+        context['message'] = "prodotto inesistente"
+        render(request, "store_app/message.html", context)
+    
+    return render(request, 'store_app/modifie_product.html', context)
+
+
 def add_prod(request):
-    pr = Product.objects.all()
-    cat = Category.objects.all()
-    subcat = SubCategory.objects.all()
     if request.method == "POST":
         rqst = request.POST
-
         pp = Product.objects.create(
             name=rqst.get('name'),
             category=Category.objects.get(name=rqst.get('cat')),
             sub_cat=SubCategory.objects.get(name=rqst.get('subcategory'))
         )
-        debug_(pp)
-    context = {
-        "auth": request.user.is_authenticated,
-        "user": request.user,
-        "p": pr,
-        "cat": cat,
-        "subcat": subcat,
-        "title": "Homepage",
-        "name": request.user.username
-    }
+
+    context = get_mycontext(request)
+    context["p"] = Product.objects.all()
+    context["cat"] = Category.objects.all()
+    context["subcat"] = SubCategory.objects.all()
     if request.user.is_authenticated:
             return render(request, 'store_app/insert_data.html', context)
     return render(request, 'store_app/auth_error.html', context)
 
-
 def login_view(request):
-    context = {
-        'error': False,
-        "title": "Login",
-        "auth": request.user.is_authenticated,
-        "message":"",               
-    }
+    context = get_mycontext(request)
+    context["title"] = "Login"
+    context["error"] = False
     if request.method == "POST":
         context['error'] = "Login o password non corrette"
         user = authenticate(username=request.POST.get("username"),
@@ -84,18 +111,12 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    context = {"auth": request.user.is_authenticated}
     return redirect('/')
 
 
 def register_user(request):
-    context = {
-        "name": request.user.username,
-        "message": '',
-        "auth": request.user.is_authenticated,
-        "user": request.user,
-        "reg_type": "register"
-        }
+    context = get_mycontext(request)
+    context["title"] = "Register User"
 
     if request.method == 'POST':
         name = request.POST.get("username")
@@ -110,20 +131,11 @@ def register_user(request):
         return render(request, 'store_app/register.html', context)
     return render(request, 'store_app/register.html', context)
 
-
-
 def register_superuser(request):
     if not request.user.is_superuser:
         raise PermissionDenied()
-    context = {
-        "title": "Register Superuser",
-        "name": request.user.username,
-        "message": '',
-        "auth": request.user.is_authenticated,
-        "reg_type": "registersuperuser"
-        # "user": request.user,
-        }
-
+    context = get_mycontext(request)
+    context["title"] = "Register Superuser"
     if request.method == 'POST':
         name = request.POST.get("username")
         email = request.POST.get("email")
@@ -136,28 +148,33 @@ def register_superuser(request):
         context['message'] = "tutti i campi sono obbligatori e le password devono coincidere"
         return render(request, 'store_app/register.html', context)
     return render(request, 'store_app/register.html', context)    
-        
-        
 
 
 def all_users(request):
     if not request.user.is_superuser:
         raise PermissionDenied()
-    u = User.objects.all()
-    
-    
-
-    context = {
-    "title": "Allusers",
-    "name": request.user.username,
-    "message": '',
-    "auth": request.user.is_authenticated,
-    "reg_type": "registersuperuser",
-    "user": request.user,
-    "users": u,
-    }
-
+    context = get_mycontext(request)
+    context["title"] = "Allusers"
+    context["user"] = User.objects.all()
     return render(request, "store_app/allusers.html", context)
     
 
+def detail_product(request, my_id):
+    context = get_mycontext(request)
+    context["title"] = "Detail Product"
+    context["product"] = Product.objects.get(pk=my_id)
+    return render(request, "store_app/detail_product.html", context)
 
+
+
+def remove_detail(request, my_id):
+    context = get_mycontext(request)
+    debug_(context)
+    try:
+        Product.objects.get(pk=my_id).delete()
+        context['message'] = "prodotto rimosso"
+
+    except ObjectDoesNotExist:
+        context['message'] = "prodotto inesistente"
+        render(request, "store_app/message.html", context)
+    return render(request, "store_app/message.html", context)

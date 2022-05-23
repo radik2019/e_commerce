@@ -10,6 +10,7 @@
             <thead>
                 <tr>
                     <th scope="col">#</th>
+                    <th scope="col">ID</th>
                     <th scope="col">Name</th>
                     <th scope="col">Category</th>
                     <th scope="col">Sub Category</th>
@@ -21,8 +22,9 @@
                     <tr class="mb-3">
                         
                         <th scope="row">1</th>
+                        <th scope="row">{{ i.pk }}</th>
                         {% comment %} <td> <a href="{% url 'login' %} style="display:block;">&nbsp;">{{ i.name }}</a></td> {% endcomment %}
-                        <td><a href="{% url 'login' %}" style="display:block;">&nbsp; {{ i.name }} </a></td>
+                        <td><a href="{% url 'index' %}{{ i.pk }}/" style="display:block; color:#000000;" name="mylist">&nbsp; {{ i.name }} </a></td>
                         <td>{{ i.category.name }}</td>
                         <td>{{ i.sub_cat.name }}</td>
                     </tr>
@@ -30,6 +32,8 @@
             </tbody>
 
         </table>
+
+
 
     {% else %}
         <h2> Non sei authorizzato </h2>
