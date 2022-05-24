@@ -3,7 +3,7 @@
 {% extends "store_app/base.html" %}
 {% block content %}
     <h2 style="text-align:center;"> Product detail</h2>
-    <br>
+    <br>  <hr>
     <p style="text-align:center;"> ID: <strong style="color:#ccff66;font-size:150%;">{{ product.id }} </strong></p>
     <p style="text-align:center;"> Nome: <strong style="color:#ccff66;font-size:150%;">{{ product.name }}</strong> </p>
     <p style="text-align:center;"> Category: <strong style="color:#ccff66;font-size:150%;">{{ product.category.name }} </strong> </p>
@@ -13,24 +13,53 @@
     <p style="text-align:center;"> Price: <strong style="color:#ccff66;font-size:150%;">{{ product.price }} </strong></p>
     <p style="text-align:center;"> Product ID: <strong style="color:#ccff66;font-size:150%;">{{ product.code_product }} </strong></p>
     <p style="text-align:center;"> Discount: <strong style="color:#ccff66;font-size:150%;">{{ product.discount }} </strong></p>
-    
+  
+
+    <hr>
     <br>
-
-    {{ product }}
-
+        <p>{{ message }}</p>
+    <br>
 
 
     {% if user.is_superuser %}
 
         <form method="POST" class="row g-3">
             {% csrf_token %}
-            <button formaction="{% url 'index' %}{{ product.id }}/del/" type="submit"  class="btn btn-outline-light w-25">Remove Product</button>
+            <button formaction="{% url 'index' %}{{ product.id }}/del/" type="submit"
+             class="btn btn-outline-light w-25 position-absolute start-50 translate-middle mt-1">Remove Product</button>
         </form>
+        <br>
+            <br>
             <br>
         <form method="POST" class="row g-3">
             {% csrf_token %}
-            <button formaction="{% url 'index' %}{{ product.id }}/mod/" type="submit"  class="btn btn-outline-light w-25">Modifi product</button>
+            <button formaction="{% url 'index' %}{{ product.id }}/mod/" type="submit"
+             class="btn btn-outline-light w-25 position-absolute start-50 translate-middle mt-1">Modifi product</button>
         </form>
+    {% else %}
+
+        <form class="position-absolute start-50 translate-middle mt-1" method="POST" class="row g-3 ">
+            {% csrf_token %}
+            <br><br>
+            <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
+                <span class="input-group-text" id="inputGroup-sizing-default">Avaiability</span>
+                
+                <input type="number" min="0" max="{{ product.avaiability }}" class="form-control" aria-label="Sizing example input" 
+                aria-describedby="inputGroup-sizing-default" name="avaiability" >
+</div>
+            <br><br>
+
+
+            <button formaction="{% url 'cart' %}" type="submit"
+            class="btn btn-outline-light w-25">Add to Cart</button>
+            <input type="hidden" min="0" max="{{ product.avaiability }}" class="form-control" aria-label="Sizing example input" 
+            aria-describedby="inputGroup-sizing-default" name="avaiability" >
+
+            
+            <button formaction="{% url 'index' %}{{ product.id }}/buy/" type="submit"
+            class="btn btn-outline-light w-25">Buy</button>
+        </form>
+        
     
     {% endif %}
     

@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
+from django.http.response import JsonResponse, HttpResponse
+from django.forms.models import model_to_dict
 from utils import debug_
 from .models import (
     Customer,
@@ -13,6 +15,19 @@ from .models import (
     SubCategory
 )
 
+ 
+
+def get_mycontext(request):
+    context = {
+    "title": "",
+    "name": request.user.username,
+    "message": '',
+    "auth": request.user.is_authenticated,
+    "reg_type": "registersuperuser",
+    "user": request.user,
+    "is_staff": request.user.is_staff
+    }
+    return context
 
 
 def auth_superuser(func):
@@ -24,19 +39,27 @@ def auth_superuser(func):
     return wrapper
 
 
-def get_mycontext(request):
-    context = {
-    "title": "",
-    "name": request.user.username,
-    "message": '',
-    "auth": request.user.is_authenticated,
-    "reg_type": "registersuperuser",
-    "user": request.user
-    }
-    return context
+
+def add_to_cart(request):
+    if request.user.is_authenticated and (not request.user.is_staff):
+        context = get_mycontext(request)
+        crt = Cart.objects.first()
+        debug_(crt.user.user.username ,request.user.get_username())
+        usr = User.objects.get(username=request.user.get_username())
+        customer = Customer.objects.get(user=usr)
+        cart = Cart.objects.filter(user=customer)
+        
+
+    context["cart"] = cart
+
+    if request.user.is_authenticated:
+            return render(request, "store_app/cart.html", context)
+    return render(request, 'store_app/auth_error.html', context)
 
 
 def index(request):
+
+    debug_(request.user.is_authenticated, request.user.is_staff)
     pr = [i for i in Product.objects.all()]
     cat = Category.objects.all()
     subcat = SubCategory.objects.all()
@@ -50,7 +73,8 @@ def index(request):
         "name": request.user.username
     }
     if request.user.is_authenticated:
-            return render(request, 'store_app/index.html', context)
+        return render(request, 'store_app/index.html', context)
+        debug_(request.user.is_authenticated)
     return render(request, 'store_app/auth_error.html', context)
 
 

@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.urls import path
 from store_app.views import *
+from store_app import api_views
 
 
 urlpatterns = [
@@ -17,6 +18,9 @@ urlpatterns = [
     path('<int:my_id>/', detail_product,),
     path('<int:my_id>/', detail_product,),
     path('<int:my_id>/mod/', modifie_product,),
+    path('cart', add_to_cart, name="cart"),
+    path('<int:my_id>/buy/', detail_product),
+    path('api/products/', api_views.all_product, name='productsapi'),
 ]
 
 

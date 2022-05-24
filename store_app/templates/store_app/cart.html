@@ -1,0 +1,15 @@
+
+
+{% extends "store_app/base.html" %}
+{% block content %}
+    <h2 style="text-align:center;"> My cart</h2>
+    <br>  <hr>
+    {% for product in cart %}
+        <p>{{ product.product.name }},  prezzo {{ product.product.price }}, pezzi {{product.avaiability}}</p>
+    {% endfor %}
+    
+{% endblock %}
+
+
+
+

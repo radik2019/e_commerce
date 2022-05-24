@@ -1,24 +1,29 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 
 class Customer(models.Model):
+    
     name = models.CharField(max_length=255, blank=True, null=True)
     debt_card = models.CharField(max_length=255, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     def __str__(self):
         return self.name
 
 
 class Cart(models.Model):
-    customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    user = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank= True, null=True)
     avaiability = models.IntegerField(default=0, null=True, blank=True)
     def __str__(self):
-        return self
+        return f"Cart {self.user.name}"
 
 
 class Product(models.Model):
-    first_add_date = models.DateField(auto_now_add=True, null=True, blank=True)
-    avaiability = models.IntegerField(default=0, null=True, blank=True)
+    first_add_date = models.DateField(
+        verbose_name="Data quando e` stato aggiunto per la prima volta" ,auto_now_add=True, null=True, blank=True)
+    avaiability = models.IntegerField(default=0, null=True, blank=True, verbose_name="Quantita` di prodotti nel magazzino")
     price = models.FloatField(default=0.00, null=True, blank=True)
     code_product = models.CharField(max_length=234, null=True, blank=True, unique=True)
     name = models.CharField(max_length=255)
