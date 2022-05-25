@@ -4,10 +4,20 @@
 {% block content %}
     <h2 style="text-align:center;"> My cart</h2>
     <br>  <hr>
-    {% for product in cart %}
-        <p>{{ product.product.name }},  prezzo {{ product.product.price }}, pezzi {{product.avaiability}}</p>
-    {% endfor %}
-    
+
+
+
+    <form method="post" action="{% url 'removefromcart' %}">
+        {% csrf_token %}
+        <p>
+        {% for product in cart %}
+
+            <input type="checkbox" name="rm{{ product.pk }}" >{{product.avaiability}}pcs, {{ product.product.name }}, total price: <strong> {{ product.get_sum_of_product_cost }}</strong> <input type="number"  placeholder="pezzi da rimuovere" name="pcs{{ product.pk }}", min="0", max="{{ product.avaiability }}"> <Br>
+
+        {% endfor %}
+        </p>
+        <p><input type="submit" value="Remove from cart"></p>
+    </form>
 {% endblock %}
 
 

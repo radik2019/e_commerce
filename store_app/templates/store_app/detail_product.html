@@ -40,24 +40,20 @@
 
         <form class="position-absolute start-50 translate-middle mt-1" method="POST" class="row g-3 ">
             {% csrf_token %}
-            <br><br>
-            <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 400px; ">
+
+            <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 650px; ">
                 <span class="input-group-text" id="inputGroup-sizing-default">Avaiability</span>
                 
                 <input type="number" min="0" max="{{ product.avaiability }}" class="form-control" aria-label="Sizing example input" 
                 aria-describedby="inputGroup-sizing-default" name="avaiability" >
-</div>
-            <br><br>
-
 
             <button formaction="{% url 'cart' %}" type="submit"
             class="btn btn-outline-light w-25">Add to Cart</button>
-            <input type="hidden" min="0" max="{{ product.avaiability }}" class="form-control" aria-label="Sizing example input" 
-            aria-describedby="inputGroup-sizing-default" name="avaiability" >
-
+            <input type="hidden" name="id" value="{{ product.pk }} ">
             
             <button formaction="{% url 'index' %}{{ product.id }}/buy/" type="submit"
             class="btn btn-outline-light w-25">Buy</button>
+        </div>
         </form>
         
     

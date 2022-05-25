@@ -18,7 +18,11 @@ urlpatterns = [
     path('<int:my_id>/', detail_product,),
     path('<int:my_id>/', detail_product,),
     path('<int:my_id>/mod/', modifie_product,),
+
     path('cart', add_to_cart, name="cart"),
+    path('removefromcart', remove_from_cart, name="removefromcart"),
+
+
     path('<int:my_id>/buy/', detail_product),
     path('api/products/', api_views.all_product, name='productsapi'),
 ]

@@ -10,6 +10,17 @@ class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     def __str__(self):
         return self.name
+    @property
+    def get_json_data(self):
+        dct = {
+            'id': self.pk,
+            'username': self.user.username,
+            'name': self.name,
+            'debt_card': self.debt_card,
+            'email': self.user.email,
+            'password': self.user.password
+        }
+        return dct
 
 
 class Cart(models.Model):
@@ -18,11 +29,29 @@ class Cart(models.Model):
     avaiability = models.IntegerField(default=0, null=True, blank=True)
     def __str__(self):
         return f"Cart {self.user.name}"
+    
+    @property
+    def get_sum_of_product_cost(self):
+        return round(self.product.price * self.avaiability, 2)
+    
+    @property
+    def get_json_data(self):
+        dct = {
+            'id': self.pk,
+            'user': self.user.get_json_data,
+            'avaiability': self.avaiability,
+            'product': self.product.get_json_data
+        }
+        return dct
 
 
 class Product(models.Model):
     first_add_date = models.DateField(
-        verbose_name="Data quando e` stato aggiunto per la prima volta" ,auto_now_add=True, null=True, blank=True)
+        verbose_name="Data quando e` stato aggiunto per la prima volta",
+        auto_now_add=True,
+        null=True,
+        blank=True
+    )
     avaiability = models.IntegerField(default=0, null=True, blank=True, verbose_name="Quantita` di prodotti nel magazzino")
     price = models.FloatField(default=0.00, null=True, blank=True)
     code_product = models.CharField(max_length=234, null=True, blank=True, unique=True)
@@ -40,6 +69,25 @@ class Product(models.Model):
         null=True,
         blank=True
     )
+
+    @property
+    def get_json_data(self):
+        dct = {
+            'id': self.pk,
+            'first_add_date':  self.first_add_date,
+            'avaiability':  self.avaiability,
+            'price':  self.price,
+            'code_product':  self.code_product,
+            'name':  self.name,
+            'discount':  self.discount,
+            'category': self.category.name,
+            'sub_cat': self.sub_cat.name
+        }
+        return dct
+
+
+
+
     def __str__(self):
         return self.name
 

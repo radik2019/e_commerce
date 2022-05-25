@@ -16,11 +16,16 @@ from .models import (
     Category,
     SubCategory
 )
+import datetime
 
 
 
 def all_product(request):
+    debug_(dir(request.method))
     collection = Product.objects.all()
-
     serializated = [*map(lambda m: model_to_dict(m), collection)]
+    serializated = [model_to_dict(i) for i in collection]
+
+    debug_(collection[0].get_json_data)
+
     return JsonResponse(serializated, status=200, safe=False)
