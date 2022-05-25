@@ -37,25 +37,29 @@
              class="btn btn-outline-light w-25 position-absolute start-50 translate-middle mt-1">Modifi product</button>
         </form>
     {% else %}
-
-        <form class="position-absolute start-50 translate-middle mt-1" method="POST" class="row g-3 ">
+    <br>
+    <br>
+        <form class="position-absolute start-50 translate-middle mt-3" method="POST" class="row g-4 ">
             {% csrf_token %}
-
-            <div class="input-group mb-3 .bg-info.bg-gradient" style="width: 650px; ">
-                <span class="input-group-text" id="inputGroup-sizing-default">Avaiability</span>
-                
-                <input type="number" min="0" max="{{ product.avaiability }}" class="form-control" aria-label="Sizing example input" 
-                aria-describedby="inputGroup-sizing-default" name="avaiability" >
-
-            <button formaction="{% url 'cart' %}" type="submit"
-            class="btn btn-outline-light w-25">Add to Cart</button>
-            <input type="hidden" name="id" value="{{ product.pk }} ">
             
-            <button formaction="{% url 'index' %}{{ product.id }}/buy/" type="submit"
-            class="btn btn-outline-light w-25">Buy</button>
-        </div>
+            <br>
+            <div class="input-group mb-2 .bg-info.bg-gradient" style="width: 550px; ">
+                <span class="input-group-text" id="inputGroup-sizing-default">Avaiability</span>
+                <input type="number" min="0" max="{{ product.avaiability }}" class="form-control" aria-describedby="inputGroup-sizing-default" name="avaiability">
+            </div>
+            <div class="input-group mb-2 .bg-info.bg-gradient" style="width: 550px; ">  
+                <br>
+                <button formaction="{% url 'cart' %}" type="submit" class="btn btn-outline-light w-11">Add to Cart</button>
+            </div>
+            <div class="input-group mb-2 .bg-info.bg-gradient" style="width: 550px; ">
+                <button formaction="{% url 'index' %}{{ product.id }}/buy/" type="submit" class="btn btn-outline-light w-11">Buy</button>
+            </div>
+                <input type="hidden" name="id" value="{{ product.pk }} ">
+            
+               
+    
         </form>
-        
+        <br>
     
     {% endif %}
     

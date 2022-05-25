@@ -4,22 +4,39 @@
 {% block content %}
     <h2 style="text-align:center;"> My cart</h2>
     <br>  <hr>
-
-
-
-    <form method="post" action="{% url 'removefromcart' %}">
+    <form  method="post">
         {% csrf_token %}
-        <p>
-        {% for product in cart %}
+        <table class="table table-striped table-hover">
 
-            <input type="checkbox" name="rm{{ product.pk }}" >{{product.avaiability}}pcs, {{ product.product.name }}, total price: <strong> {{ product.get_sum_of_product_cost }}</strong> <input type="number"  placeholder="pezzi da rimuovere" name="pcs{{ product.pk }}", min="0", max="{{ product.avaiability }}"> <Br>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Pieces</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Select</th>
+                    <th scope="col">Input remove</th>
+                </tr>
+            </thead>
 
-        {% endfor %}
-        </p>
-        <p><input type="submit" value="Remove from cart"></p>
+            <tbody>
+                {% for product in cart %}
+                    <tr class="mb-3">
+                        
+                        <th scope="row">1</th>
+                        <td scope="row">{{ product.avaiability }}</td>
+                        <th scope="row">{{ product.product.name }}</th>
+                        <td> {{ product.get_sum_of_product_cost }}</td>
+                        <td><input type="checkbox" name="rm{{ product.pk }}" > </td>
+                        <th scope="row"> <input type="number"  placeholder="pezzi da rimuovere" name="pcs{{ product.pk }}", min="0", max="{{ product.avaiability }}"></th>  
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <button formaction="{% url 'removefromcart' %}" type="submit" class="btn btn-outline-light w-25">Remove from cart</button>
+        <br>
+        <button formaction="{% url 'index' %}" type="submit" class="btn btn-outline-light w-25">Buy</button>
     </form>
 {% endblock %}
-
-
-
 

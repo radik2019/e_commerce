@@ -22,7 +22,7 @@ def auth_superuser(func):
             return render(request, "store_app/message.html", {"message": "error 403 Accesso negato!!"})
         return func(request, *args, **kwargs)
     return wrapper
- 
+
 
 def get_mycontext(request):
     context = {
@@ -38,10 +38,6 @@ def get_mycontext(request):
 
 
 def remove_from_cart(request):
-    sd =  {'csrfmiddlewaretoken': 'eQsmqJFc06gv8WsBSXrY1w03zEOzE90RRgKS1I2fi2lPaUOkaqyrafr256snXTSC',
-        'rm7': 'on', 'pcs7': '14', 'rm11': 'on', 'pcs11': '11', 'rm12': 'on', 'pcs12': '1'}
-
-
     if request.user.is_authenticated and (not request.user.is_staff):
         context = get_mycontext(request)
         usr = User.objects.get(username=request.user.get_username())
@@ -49,20 +45,22 @@ def remove_from_cart(request):
         cart = Cart.objects.filter(user=customer)
         if request.method == "POST":
             deleted, lst = [], request.POST.dict()
-            pieces_to_remove = {int(i[3:]): lst[i] for i in lst if i.startswith('pcs')}
+            pieces_to_remove = {int(i[3:]): lst[i] for i in lst if (i.startswith('pcs') and lst[i].isdigit())}
             product_to_remove = [int(i[2:]) for i in lst if i.startswith('rm')]
             for i in pieces_to_remove:
                 prd = cart.get(pk=i)
-                prd.avaiability = int(prd.avaiability) - int(pieces_to_remove[i])
-                prd.save()
-                debug_(prd)
-            
-            
-            # lst.pop(0)
-            
-
-
-
+                rest_of_cart =  prd.avaiability - int(pieces_to_remove[i])
+                if rest_of_cart:
+                    prd.avaiability = rest_of_cart
+                    prd.save()
+                    debug_(pieces_to_remove,  product_to_remove)
+                    deleted.append(i)
+                else:
+                    prd.delete()
+            for k in product_to_remove:
+                if k not in deleted:
+                    prd = cart.get(pk=k)
+                    prd.delete()
         return render(request, "store_app/cart.html", context)
     return render(request, 'store_app/auth_error.html', context)
 
@@ -80,7 +78,6 @@ def add_to_cart(request):
 
             prd = Product.objects.get(pk=request.POST.get('id'))
             df = cart.filter(product=prd)
-            debug_(df)
             if df:
                 df = df[0]
                 if (df.avaiability + int(request.POST.get('avaiability'))) > prd.avaiability:
