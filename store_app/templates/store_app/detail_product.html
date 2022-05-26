@@ -14,19 +14,16 @@
     <p style="text-align:center;"> Product ID: <strong style="color:#ccff66;font-size:150%;">{{ product.code_product }} </strong></p>
     <p style="text-align:center;"> Discount: <strong style="color:#ccff66;font-size:150%;">{{ product.discount }} </strong></p>
   
-
     <hr>
     <br>
         <p>{{ message }}</p>
     <br>
-
-
     {% if user.is_superuser %}
 
         <form method="POST" class="row g-3">
             {% csrf_token %}
             <button formaction="{% url 'index' %}{{ product.id }}/del/" type="submit"
-             class="btn btn-outline-light w-25 position-absolute start-50 translate-middle mt-1">Remove Product</button>
+             class="btn btn-outline-light w-55 position-absolute start-50 translate-middle mt-1">Remove Product</button>
         </form>
         <br>
             <br>
@@ -34,33 +31,24 @@
         <form method="POST" class="row g-3">
             {% csrf_token %}
             <button formaction="{% url 'index' %}{{ product.id }}/mod/" type="submit"
-             class="btn btn-outline-light w-25 position-absolute start-50 translate-middle mt-1">Modifi product</button>
+             class="btn btn-outline-light w-25 position-absolute start-50 translate-middle mt-14">Modifi product</button>
         </form>
     {% else %}
-    <br>
-    <br>
-        <form class="position-absolute start-50 translate-middle mt-3" method="POST" class="row g-4 ">
+
+        <form class="position-absolute start-50 translate-middle mt-3" method="POST" class="row g-9 ">
             {% csrf_token %}
             
-            <br>
-            <div class="input-group mb-2 .bg-info.bg-gradient" style="width: 550px; ">
+            <input type="hidden" name="id" value="{{ product.pk }}">
+
+            <div class="input-group mb-1 .bg-info.bg-gradient w-100 p-1" >
                 <span class="input-group-text" id="inputGroup-sizing-default">Avaiability</span>
-                <input type="number" min="0" max="{{ product.avaiability }}" class="form-control" aria-describedby="inputGroup-sizing-default" name="avaiability">
+                <input type="number" min="0" max="{{ product.avaiability }}" class="form-control " aria-describedby="inputGroup-sizing-default" name="avaiability">
             </div>
-            <div class="input-group mb-2 .bg-info.bg-gradient" style="width: 550px; ">  
-                <br>
-                <button formaction="{% url 'cart' %}" type="submit" class="btn btn-outline-light w-11">Add to Cart</button>
-            </div>
-            <div class="input-group mb-2 .bg-info.bg-gradient" style="width: 550px; ">
-                <button formaction="{% url 'index' %}{{ product.id }}/buy/" type="submit" class="btn btn-outline-light w-11">Buy</button>
-            </div>
-                <input type="hidden" name="id" value="{{ product.pk }} ">
-            
-               
-    
+            <button formaction="{% url 'cart' %}" type="submit" class="btn btn-outline-info w-100 p-2 mb-1" >Add to Cart</button>
+
+            <button formaction="{% url 'index' %}{{ product.id }}/buy/" type="submit" class="btn btn-outline-warning w-100 p-2 mb-1" >Buy</button>
         </form>
         <br>
-    
     {% endif %}
     
 {% endblock %}

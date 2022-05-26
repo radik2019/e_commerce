@@ -6,45 +6,51 @@
     <h2 class="position-absolute top-40 start-50 translate-middle">Lista dei dati</h2>
     <br><br>
         <table class="table table-striped table-hover">
-
             <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">ID</th>
+                    <th scope="col">Product Code</th>
                     <th scope="col">Name</th>
                     <th scope="col">Category</th>
                     <th scope="col">Sub Category</th>
-
                     <th scope="col">Avaiability</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Product Code</th>
                     <th scope="col">Discount</th>
-                    
+                    <th scope="col">Price</th>
+                    <th scope="col">Discounted Price</th>
                 </tr>
             </thead>
-
             <tbody>
                 {% for i in pr %}
-                    <tr class="mb-3">
-                        
-                        <th scope="row">1</th>
-                        <th scope="row">{{ i.pk }}</th>
-                        <td><a href="{% url 'index' %}{{ i.pk }}/" style="display:block; color:#000000;" name="mylist">&nbsp; {{ i.name }} </a></td>
+                    {% if i.avaiability == 0 and not is_staff %}
+                    {% comment %} hgjhgj {% endcomment %}
+                    {% else %}
+
+                        {% if i.discount == 0 %}
+                            <tr class="mb-3" style="color: #00ffff; background-color: #252b36">
+                        {% else %}
+                            <tr style="color:yellow; background-color:  #282922">{{ i.discount }}
+                        {% endif %}
+                        <td>{{ i.code_product }}</td>
+                        <td scope="row">
+                            <form  method="post">
+                                {% csrf_token %}
+                                {% if i.discount == 0 %}
+                                    <button formaction="{% url 'index' %}{{ i.pk }}/" type="submit" class="btn btn-outline-info w-100 " >{{ i.name }}</button>
+                                {% else %}
+                                    <button formaction="{% url 'index' %}{{ i.pk }}/" type="submit" class="btn btn-outline-warning w-100" >{{ i.name }}</button>
+                                {% endif %}
+                            </form>
+                        </td>
                         <td>{{ i.category.name }}</td>
                         <td>{{ i.sub_cat.name }}</td>
-
                         <td>{{ i.avaiability }}</td>
-                        <td>{{ i.price }}</td>
-                        <td>{{ i.code_product }}</td>
                         <td>{{ i.discount }}</td>
-
-                    </tr>
+                        <td >{{ i.price }}</td>
+                        <td>{{ i.discounted_price }}</td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
-
         </table>
-
-
 
     {% else %}
         <h2> Non sei authorizzato </h2>
@@ -53,6 +59,5 @@
             <h2 class="text-white">Login</h2>
         </a>
     {% endif %}
-
 
 {% endblock %}

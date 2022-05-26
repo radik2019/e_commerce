@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from utils import subtract_perecnt
 
 
 
@@ -8,8 +9,11 @@ class Customer(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     debt_card = models.CharField(max_length=255, blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+    address = models.JSONField(null=True, name="address")
+    
     def __str__(self):
         return self.name
+    
     @property
     def get_json_data(self):
         dct = {
@@ -21,6 +25,18 @@ class Customer(models.Model):
             'password': self.user.password
         }
         return dct
+
+
+class Order(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
+    product = models.ForeignKey("Product", on_delete=models.CASCADE, blank=True, null=True)
+
+    @property
+    def address(self):
+        return self.customer.address
+    
+    def __str__(self):
+        s = f"Order {self.customer.user.username} {self.product.name}"
 
 
 class Cart(models.Model):
@@ -81,12 +97,14 @@ class Product(models.Model):
             'name':  self.name,
             'discount':  self.discount,
             'category': self.category.name,
-            'sub_cat': self.sub_cat.name
+            'sub_cat': self.sub_cat.name,
+            'discounted_price': self.subtract_perecnt(self.price, self.discount)
         }
         return dct
-
-
-
+    
+    @property
+    def discounted_price(self):
+        return subtract_perecnt(self.price, self.discount)
 
     def __str__(self):
         return self.name

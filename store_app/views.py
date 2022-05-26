@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse, HttpResponse
 from django.forms.models import model_to_dict
-from utils import debug_
+from utils import debug_, subtract_perecnt
 from .models import (
     Customer,
     Cart,
@@ -75,7 +75,9 @@ def add_to_cart(request):
 
         context["cart"] = cart
         if request.method == "POST":
-
+            if not request.POST.get("avaiability"):
+                context["message"] = "Seleziona la quantita` da aggiungere"
+                return render(request, 'store_app/message.html', context)
             prd = Product.objects.get(pk=request.POST.get('id'))
             df = cart.filter(product=prd)
             if df:
@@ -108,7 +110,8 @@ def index(request):
         "cat": cat,
         "subcat": subcat,
         "title": "Homepage",
-        "name": request.user.username
+        "name": request.user.username,
+        "is_staff": request.user.is_staff
     }
     if request.user.is_authenticated:
         return render(request, 'store_app/index.html', context)

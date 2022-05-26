@@ -17,6 +17,9 @@ def debug_(*args):
     line()
 
 
+def subtract_perecnt(number: int, percent: int):
+    return round(number - ((number * percent) / 100), 2)
+
 
 
 
