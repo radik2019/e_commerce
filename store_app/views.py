@@ -53,7 +53,6 @@ def remove_from_cart(request):
                 if rest_of_cart:
                     prd.avaiability = rest_of_cart
                     prd.save()
-                    debug_(pieces_to_remove,  product_to_remove)
                     deleted.append(i)
                 else:
                     prd.delete()
@@ -67,12 +66,12 @@ def remove_from_cart(request):
 
 def add_to_cart(request):
     if request.user.is_authenticated and (not request.user.is_staff):
-
         context = get_mycontext(request)
         usr = User.objects.get(username=request.user.get_username())
         customer = Customer.objects.get(user=usr)
         cart = Cart.objects.filter(user=customer)
-
+        context["cart_summ"] = sum([i.get_sum_of_product_cost for i in cart])
+        context["cart_dicounted_summ"] = sum([i.get_discounted_sum for i in cart])
         context["cart"] = cart
         if request.method == "POST":
             if not request.POST.get("avaiability"):
@@ -94,7 +93,6 @@ def add_to_cart(request):
                     product=prd,
                     avaiability=request.POST.get('avaiability')
                     )
-
         return render(request, "store_app/cart.html", context)
     return render(request, 'store_app/auth_error.html', context)
 
@@ -139,7 +137,6 @@ def modifie_product(request, my_id):
             product.avaiability = request.POST.get("avaiability")
             product.code_product = request.POST.get("code_product")
             product.discount = request.POST.get("discount")
-            
             product.save()
             context["message"] = "Le modifiche sono state salvate con successo"
             
@@ -183,9 +180,7 @@ def login_view(request):
         user = authenticate(username=request.POST.get("username"),
                         password=request.POST.get("password"))
         if user is not None:
-            
             login(request, user)
-            debug_(User.objects.all() ,user.password)
             return redirect('/')
         return render(request, "store_app/login.html", context)
     return render(request, "store_app/login.html", context)
@@ -199,7 +194,6 @@ def logout_view(request):
 def register_user(request):
     context = get_mycontext(request)
     context["title"] = "Register User"
-
     if request.method == 'POST':
         name = request.POST.get("username")
         email = request.POST.get("email")
@@ -256,11 +250,9 @@ def detail_product(request, my_id):
 
 def remove_detail(request, my_id):
     context = get_mycontext(request)
-
     try:
         Product.objects.get(pk=my_id).delete()
         context['message'] = "prodotto rimosso"
-
     except ObjectDoesNotExist:
         context['message'] = "prodotto inesistente"
         render(request, "store_app/message.html", context)

@@ -51,6 +51,11 @@ class Cart(models.Model):
         return round(self.product.price * self.avaiability, 2)
     
     @property
+    def get_discounted_sum(self):
+        return round(self.product.discounted_price * self.avaiability, 2)
+    
+    
+    @property
     def get_json_data(self):
         dct = {
             'id': self.pk,
@@ -62,6 +67,7 @@ class Cart(models.Model):
 
 
 class Product(models.Model):
+    image = models.ImageField(null=True, blank=True)
     first_add_date = models.DateField(
         verbose_name="Data quando e` stato aggiunto per la prima volta",
         auto_now_add=True,
