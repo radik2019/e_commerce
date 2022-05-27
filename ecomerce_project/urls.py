@@ -18,19 +18,14 @@ urlpatterns = [
     path('<int:my_id>/', detail_product,),
     path('<int:my_id>/', detail_product,),
     path('<int:my_id>/mod/', modifie_product,),
-
     path('cart', add_to_cart, name="cart"),
     path('removefromcart', remove_from_cart, name="removefromcart"),
-
-
     path('<int:my_id>/buy/', detail_product),
+
+    path('buyfromcart/', BuyFromCart.as_view(), name="buyfromcart"),
+    path('buydetail/', BuyDetail.as_view(), name="buydetail"),
+    path('buyallcart/', BuyAllCart.as_view(), name="buyallcart"),
+
     path('api/products/', api_views.all_product, name='productsapi'),
 ]
-
-
-
-
-
-
-
 

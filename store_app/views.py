@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse, HttpResponse
 from django.forms.models import model_to_dict
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from utils import debug_, subtract_perecnt
 from .models import (
     Customer,
@@ -14,6 +16,8 @@ from .models import (
     Category,
     SubCategory
 )
+
+
 
 
 def auth_superuser(func):
@@ -37,9 +41,49 @@ def get_mycontext(request):
     return context
 
 
+class BuyFromCart(View):
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        # Try to dispatch to the right method; if a method doesn't exist,
+        # defer to the error handler. Also defer to the error handler if the
+        # request method isn't on the approved list.
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(
+                self, request.method.lower(), self.http_method_not_allowed
+            )
+            debug_(handler)
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
+
+    def get(self, request):
+        debug_("buy_from_cart", "get")
+        return HttpResponse('GET result')
+
+
+    def post(self, request):
+        debug_("buy_from_cart", "post")
+        return HttpResponse('POST result')
+
+class BuyDetail(View):
+    def get(self, request):
+        debug_("buy_detail", 'get')
+        return redirect('cart')
+    def post(self, request):
+        debug_("buy_detail", 'get')
+        return redirect('cart')
+
+
+class BuyAllCart(View):
+    def get(self, request):
+        debug_("buyallcart", "get")
+        return redirect('cart')
+
+
 def remove_from_cart(request):
+    context = get_mycontext(request)
     if request.user.is_authenticated and (not request.user.is_staff):
-        context = get_mycontext(request)
+
         usr = User.objects.get(username=request.user.get_username())
         customer = Customer.objects.get(user=usr)
         cart = Cart.objects.filter(user=customer)
@@ -60,13 +104,14 @@ def remove_from_cart(request):
                 if k not in deleted:
                     prd = cart.get(pk=k)
                     prd.delete()
-        return render(request, "store_app/cart.html", context)
+        return redirect('cart')
     return render(request, 'store_app/auth_error.html', context)
 
 
 def add_to_cart(request):
+    context = get_mycontext(request)
     if request.user.is_authenticated and (not request.user.is_staff):
-        context = get_mycontext(request)
+
         usr = User.objects.get(username=request.user.get_username())
         customer = Customer.objects.get(user=usr)
         cart = Cart.objects.filter(user=customer)
@@ -74,6 +119,7 @@ def add_to_cart(request):
         context["cart_dicounted_summ"] = sum([i.get_discounted_sum for i in cart])
         context["cart"] = cart
         if request.method == "POST":
+            debug_(request.POST.dict())
             if not request.POST.get("avaiability"):
                 context["message"] = "Seleziona la quantita` da aggiungere"
                 return render(request, 'store_app/message.html', context)
