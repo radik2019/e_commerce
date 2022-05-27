@@ -42,6 +42,7 @@ def get_mycontext(request):
 
 
 class BuyFromCart(View):
+
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         # Try to dispatch to the right method; if a method doesn't exist,
@@ -60,24 +61,54 @@ class BuyFromCart(View):
         debug_("buy_from_cart", "get")
         return HttpResponse('GET result')
 
-
     def post(self, request):
         debug_("buy_from_cart", "post")
         return HttpResponse('POST result')
 
+
 class BuyDetail(View):
+
     def get(self, request):
         debug_("buy_detail", 'get')
         return redirect('cart')
+
     def post(self, request):
         debug_("buy_detail", 'get')
         return redirect('cart')
 
 
 class BuyAllCart(View):
+
     def get(self, request):
         debug_("buyallcart", "get")
         return redirect('cart')
+
+
+def add_to_order(request):
+    context = get_mycontext(request)
+    if request.user.is_authenticated and (not request.user.is_staff):
+        usr = User.objects.get(username=request.user.get_username())
+        customer = Customer.objects.get(user=usr)
+        cart = Cart.objects.filter(user=customer)
+        if request.method == "POST":
+            deleted, lst = [], request.POST.dict()
+            pieces_to_remove = {int(i[3:]): lst[i] for i in lst if (i.startswith('pcs') and lst[i].isdigit())}
+            product_to_remove = [int(i[2:]) for i in lst if i.startswith('rm')]
+            for i in pieces_to_remove:
+                prd = cart.get(pk=i)
+                rest_of_cart =  prd.avaiability - int(pieces_to_remove[i])
+                if rest_of_cart:
+                    prd.avaiability = rest_of_cart
+                    prd.save()
+                    deleted.append(i)
+                else:
+                    prd.delete()
+            for k in product_to_remove:
+                if k not in deleted:
+                    prd = cart.get(pk=k)
+                    prd.delete()
+        return render(request, 'store_app/order.html', context)
+    return render(request, 'store_app/auth_error.html', context)
 
 
 def remove_from_cart(request):

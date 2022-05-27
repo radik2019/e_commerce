@@ -30,10 +30,19 @@ class Customer(models.Model):
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
     product = models.ForeignKey("Product", on_delete=models.CASCADE, blank=True, null=True)
+    avaiability = models.IntegerField(default=0, null=True, blank=True)
+    delivered = models.BooleanField(default=False)
+    delivery_date = models.DateField(null=True, blank=True)
 
     @property
     def address(self):
         return self.customer.address
+
+    @property
+    def get_avaiability(self):
+        if self.avaiability > self.product:
+            return False
+        return True
     
     def __str__(self):
         s = f"Order {self.customer.user.username} {self.product.name}"
@@ -41,8 +50,9 @@ class Order(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank= True, null=True)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=True, null=True)
     avaiability = models.IntegerField(default=0, null=True, blank=True)
+
     def __str__(self):
         return f"Cart {self.user.name}"
     
@@ -53,8 +63,7 @@ class Cart(models.Model):
     @property
     def get_discounted_sum(self):
         return round(self.product.discounted_price * self.avaiability, 2)
-    
-    
+
     @property
     def get_json_data(self):
         dct = {

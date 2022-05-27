@@ -3,10 +3,9 @@
 
 git status
 git add .
+git status
 read -p 'Commit comment: ' comment
 git commit -m "$comment"
-git status
-
 git push
-
-#echo Thankyou  we now have your login details
+echo "\n\n"
+echo "Your commit has been pushed to GitHub"
