@@ -12,6 +12,7 @@ from utils import debug_, subtract_perecnt
 from .models import (
     Customer,
     Cart,
+    Order,
     Product,
     Category,
     SubCategory
@@ -79,9 +80,31 @@ class BuyDetail(View):
 
 class BuyAllCart(View):
 
+    def post(self, request):
+        context = get_mycontext(request)
+        usr = User.objects.get(username=request.user.get_username())
+        customer = Customer.objects.get(user=usr)
+        cart = Cart.objects.filter(user=customer)
+        for product in cart:
+            Order.objects.create(
+                customer=customer,
+                product=product.product,
+                avaiability=product.avaiability,
+            )
+            product.delete()
+        order = ''.join([f'<p style="background-color: gray; color: yellow;">{i.product.name}<p>' for i in Order.objects.filter(customer=customer)])
+
+        return HttpResponse(f"{order}")
+    
     def get(self, request):
-        debug_("buyallcart", "get")
-        return redirect('cart')
+        context = get_mycontext(request)
+        usr = User.objects.get(username=request.user.get_username())
+        customer = Customer.objects.get(user=usr)
+        cart = Cart.objects.filter(user=customer)
+        order = ''.join([f'<p style="background-color: gray; color: yellow;">{i.product.name}<p>' for i in Order.objects.filter(customer=customer)])
+        return HttpResponse(f"{order}")
+
+        
 
 
 def add_to_order(request):

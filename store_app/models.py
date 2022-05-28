@@ -46,6 +46,7 @@ class Order(models.Model):
     
     def __str__(self):
         s = f"Order {self.customer.user.username} {self.product.name}"
+        return s
 
 
 class Cart(models.Model):
