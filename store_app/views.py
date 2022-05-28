@@ -53,7 +53,6 @@ class BuyFromCart(View):
             handler = getattr(
                 self, request.method.lower(), self.http_method_not_allowed
             )
-            debug_(handler)
         else:
             handler = self.http_method_not_allowed
         return handler(request, *args, **kwargs)
