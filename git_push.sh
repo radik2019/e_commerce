@@ -1,5 +1,10 @@
 #!/bin/bash
-
+help="
+Lo script controlla se esistono nuovi commit nella repository
+e se esiste, verifica lo stato dell commit locale e se ci sono modifiche, 
+esegue lo stash poi fa il pull, e poi applica stash.
+Se invece non ci sono nuovi commit nella repository remota, fa solo il pull
+"
 
 debug=1 #if debug is commented the programm work verbose
 
@@ -34,7 +39,8 @@ stash_commit(){
     commit_and_push
 }
 
-compare_and_commit(){
+main(){
+    
     rem="$(git log --remotes -1 --format=%ct )"
     loc="$(git log -1 --format=%ct )"
     if [ $rem -gt $loc ];
@@ -68,7 +74,7 @@ compare_and_commit(){
 
 
 
-compare_and_commit
+main
 
 
 
