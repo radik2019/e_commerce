@@ -19,8 +19,6 @@ from .models import (
 )
 
 
-
-
 def auth_superuser(func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_superuser:
@@ -53,7 +51,6 @@ class BuyFromCart(View):
             handler = getattr(
                 self, request.method.lower(), self.http_method_not_allowed
             )
-            debug_(handler)
         else:
             handler = self.http_method_not_allowed
         return handler(request, *args, **kwargs)
