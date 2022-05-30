@@ -1,5 +1,5 @@
 
-
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
@@ -16,6 +16,7 @@ from .models import (
     Category,
     SubCategory
 )
+from django.views.generic import View
 import datetime
 
 '''from venv import create
@@ -28,10 +29,6 @@ from hashlib import sha256
 from django.views.decorators.csrf import csrf_exempt
 '''
 
-def debug_(s):
-    import os
-    width_wind = os.get_terminal_size().columns - 5
-    print("*" * width_wind, "\n\n", s, '\n\n' + "*" * width_wind)
 
 '''
 class RetrieveRESTViewMixin:
@@ -225,12 +222,103 @@ class CategoryView(RESTView,
     """
 '''
 
-def all_product(request):
-    debug_(dir(request.method))
-    collection = Product.objects.all()
-    serializated = [*map(lambda m: model_to_dict(m), collection)]
-    serializated = [model_to_dict(i) for i in collection]
+from django.core.serializers import serialize
+import json
+from json import JSONEncoder
+from typing import Any
+from django.forms.models import model_to_dict
+from django.views.decorators.csrf import csrf_exempt
 
-    debug_(collection[0].get_json_data)
 
-    return JsonResponse(serializated, status=200, safe=False)
+class RESTView(View):
+    model = None
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(
+                self, request.method.lower(), self.http_method_not_allowed
+            )
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
+
+
+
+class ProductViews(RESTView):
+
+    def get(self, request, id=None):
+        if id:
+            query_dict = Product.objects.filter(pk=id)
+            if len(query_dict) == 0:
+                
+                return JsonResponse({"error 404": "prodotto ineststente"}, safe=False, status=204)
+            sr = query_dict[0]
+            sr = sr.get_json_data
+        else:
+            query_set = Product.objects.all()
+            sr = [i.get_json_data for i in query_set]
+        return JsonResponse(sr, safe=False, status=200)
+    
+    @csrf_exempt
+    def post(self, request, id=None):
+
+        if id:
+            query_dict = Product.objects.filter(pk=id)
+            if len(query_dict) == 0:
+                return JsonResponse({"error 404": "prodotto ineststente"}, safe=False, status=204)
+            prod = query_dict[0]
+            prod.name = prod.name.upper()
+            prod.save()
+            # allowed_field_names = {
+            #     f.name for f in prod._meta.get_fields()
+            #     if is_simple_editable_field(f)
+            # }
+            lst = [fil for fil in prod._meta.get_fields()]
+            for i in lst:
+                if not i.is_relation:
+                    debug_(f'{i.name}, is_relation: {i.is_relation}, is_editable: {i.editable}, is_ID: {i.primary_key}')
+                else:
+                    
+                    n = i.many_to_many
+                    if n: n= 'many to many'
+                    elif i.many_to_one:
+                        n= 'many to one'
+                        # debug_(dir(i))
+                    elif i.one_to_one: n= 'one to one'
+                    elif i.one_to_many: n = 'one to many'
+
+
+                    debug_(f'---->   {i.model}    {i.name} not_relation , rel_class: {n},')
+
+
+
+
+            return JsonResponse({'asdasd': 'jhgjhgj'}, safe=False)
+        debug_('POST Create Products')
+        sr = {"method": "Post request"}
+
+        return JsonResponse(sr, safe=False)
+
+
+
+def is_simple_editable_field(field):
+    return (
+            field.editable
+            and not field.primary_key
+            and not isinstance(field, (ForeignObjectRel, RelatedField))
+    )
+
+def update_from_dict(instance, attrs, commit):
+    allowed_field_names = {
+        f.name for f in instance._meta.get_fields()
+        if is_simple_editable_field(f)
+    }
+
+    for attr, val in attrs.items():
+        if attr in allowed_field_names:
+            setattr(instance, attr, val)
+
+    if commit:
+        instance.save()

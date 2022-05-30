@@ -1,8 +1,9 @@
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from store_app.views import *
 from store_app import api_views
+
 
 
 urlpatterns = [
@@ -27,6 +28,9 @@ urlpatterns = [
     path('buydetail/', BuyDetail.as_view(), name="buydetail"),
     path('buyallcart/', BuyAllCart.as_view(), name="buyallcart"),
 
-    path('api/products/', api_views.all_product, name='productsapi'),
+
+
+    path('api/', include('store_app.urls')),
+    # ... snip ...
 ]
 

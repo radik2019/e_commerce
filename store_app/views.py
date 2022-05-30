@@ -19,8 +19,6 @@ from .models import (
 )
 
 
-
-
 def auth_superuser(func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_superuser:

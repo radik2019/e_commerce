@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from utils import subtract_perecnt
+from django.forms.models import model_to_dict
+# from store_app.models import *
 
 
 
@@ -102,21 +104,19 @@ class Product(models.Model):
         blank=True
     )
 
+    
+    @property
+    def get_immage(self):
+        try:
+            return self.image.url
+        except:
+            return None
+
     @property
     def get_json_data(self):
-        dct = {
-            'id': self.pk,
-            'first_add_date':  self.first_add_date,
-            'avaiability':  self.avaiability,
-            'price':  self.price,
-            'code_product':  self.code_product,
-            'name':  self.name,
-            'discount':  self.discount,
-            'category': self.category.name,
-            'sub_cat': self.sub_cat.name,
-            'discounted_price': self.subtract_perecnt(self.price, self.discount)
-        }
-        return dct
+        dct = model_to_dict(self)
+        dct["image"] = self.get_immage
+        return (dct)
     
     @property
     def discounted_price(self):
