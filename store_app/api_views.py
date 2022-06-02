@@ -27,10 +27,9 @@ from .models import Product, Brand, Category
 import json
 from hashlib import sha256
 from django.views.decorators.csrf import csrf_exempt
-'''
 
 
-'''
+
 class RetrieveRESTViewMixin:
     def get_detail(self, request, pk=None, *args, **kwargs):
         resource = self.model.objects.filter(pk=pk)  # Retrieve
@@ -263,39 +262,17 @@ class ProductViews(RESTView):
     
     @csrf_exempt
     def post(self, request, id=None):
-
+        req_payload = json.loads(request.body)
         if id:
             query_dict = Product.objects.filter(pk=id)
             if len(query_dict) == 0:
                 return JsonResponse({"error 404": "prodotto ineststente"}, safe=False, status=204)
             prod = query_dict[0]
-            prod.name = prod.name.upper()
-            prod.save()
-            # allowed_field_names = {
-            #     f.name for f in prod._meta.get_fields()
-            #     if is_simple_editable_field(f)
-            # }
-            lst = [fil for fil in prod._meta.get_fields()]
-            for i in lst:
-                if not i.is_relation:
-                    debug_(f'{i.name}, is_relation: {i.is_relation}, is_editable: {i.editable}, is_ID: {i.primary_key}')
-                else:
-                    
-                    n = i.many_to_many
-                    if n: n= 'many to many'
-                    elif i.many_to_one:
-                        n= 'many to one'
-                        # debug_(dir(i))
-                    elif i.one_to_one: n= 'one to one'
-                    elif i.one_to_many: n = 'one to many'
+            req_payload = json.loads(request.body)
+            pr = Product.objects.get(pk=id)
+            update_from_dict(pr, req_payload)
 
-
-                    debug_(f'---->   {i.model}    {i.name} not_relation , rel_class: {n},')
-
-
-
-
-            return JsonResponse({'asdasd': 'jhgjhgj'}, safe=False)
+            return JsonResponse({'file': 'Modificato'}, safe=False)
         debug_('POST Create Products')
         sr = {"method": "Post request"}
 
@@ -303,22 +280,57 @@ class ProductViews(RESTView):
 
 
 
-def is_simple_editable_field(field):
-    return (
-            field.editable
-            and not field.primary_key
-            and not isinstance(field, (ForeignObjectRel, RelatedField))
-    )
+def update_from_dict(instance, req_payload, id=None):
+    lst = [fil for fil in instance._meta.get_fields()]
+    n = ''
+    for field in lst:
+        if field.name in req_payload:
+            debug_(getattr(instance ,field.name), req_payload[field.name])
+            if field.is_relation and not field.primary_key:
+                debug_( f'*  {getattr(instance ,field.name)}')
+                ins = field.related_model.objects.get(id=req_payload[field.name])
+                setattr(instance, ins, req_payload[field.name])
 
-def update_from_dict(instance, attrs, commit):
-    allowed_field_names = {
-        f.name for f in instance._meta.get_fields()
-        if is_simple_editable_field(f)
-    }
 
-    for attr, val in attrs.items():
-        if attr in allowed_field_names:
-            setattr(instance, attr, val)
 
-    if commit:
-        instance.save()
+                # debug_('*',field.related_model.objects.get(id=getattr(instance ,field.name)))
+            else:
+                setattr(instance, field.name, req_payload[field.name])
+        # if not field.is_relation and not field.primary_key:
+        #     # debug_(f'{field.name}, is_relation: {field.is_relation}, is_editable: {field.editable}, is_ID: {field.primary_key}')
+        #     if field.name in req_payload:
+        #         setattr(instance, field.name, req_payload[field.name])
+        # else:
+            # debug_(dir(field))
+            # debug_((getattr(instance, field.name), field.related_model, field.__class__.__name__))
+            ...
+            # n += field.many_to_many
+            # if n: n += 'many to many'
+            # elif field.many_to_one:
+            #     n += 'many to one'
+            # elif field.one_to_one: n += 'one to one'
+            # elif field.one_to_many: n += f'one to many'
+            # n += '\n'
+            # n += f'"name": "{field.name}"\n"rel_class": "{n}"\n"classname": {field.__class__.__name__}'
+    instance.save()
+    # debug_(field.related_model.objects.get(id=id))
+
+
+
+    # allowed_field_names = {
+    #     f.name for f in instance._meta.get_fields()
+    #     if is_simple_editable_field(f)
+    # }
+
+    # for attr, val in attrs.items():
+    #     if attr in allowed_field_names:
+    #         setattr(instance, attr, val)
+
+    # if commit:
+    #     instance.save()
+
+
+
+
+
+
