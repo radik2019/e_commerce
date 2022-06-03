@@ -195,6 +195,8 @@ def add_to_cart(request):
 
 
 def index(request):
+    debug_(dir(request.session))
+    debug_(request.session.keys)
     pr = [i for i in Product.objects.all()]
     cat = Category.objects.all()
     subcat = SubCategory.objects.all()

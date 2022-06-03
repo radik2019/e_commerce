@@ -280,55 +280,25 @@ class ProductViews(RESTView):
 
 
 
-def update_from_dict(instance, req_payload, id=None):
-    lst = [fil for fil in instance._meta.get_fields()]
-    n = ''
-    for field in lst:
+def update_from_dict(instance, req_payload: dict):
+    """Prende un'istanza di un modello e la"""
+    # SI ITERA INSTANZA PER OGNI FIELD
+    for field in instance._meta.get_fields():
+
+        # SE IL NOME DEL FIELD C'E` NELLA req_payload
         if field.name in req_payload:
-            debug_(getattr(instance ,field.name), req_payload[field.name])
+
+            # se il field e` un relation field e non e` un primary key
             if field.is_relation and not field.primary_key:
-                debug_( f'*  {getattr(instance ,field.name)}')
-                ins = field.related_model.objects.get(id=req_payload[field.name])
-                setattr(instance, ins, req_payload[field.name])
 
+                # si crea l'istanza del field relazionale
+                field_instance = field.related_model.objects.get(id=req_payload[field.name])
+                setattr(instance, field.name, field_instance)
 
-
-                # debug_('*',field.related_model.objects.get(id=getattr(instance ,field.name)))
-            else:
+            elif not field.is_relation and not field.primary_key:
                 setattr(instance, field.name, req_payload[field.name])
-        # if not field.is_relation and not field.primary_key:
-        #     # debug_(f'{field.name}, is_relation: {field.is_relation}, is_editable: {field.editable}, is_ID: {field.primary_key}')
-        #     if field.name in req_payload:
-        #         setattr(instance, field.name, req_payload[field.name])
-        # else:
-            # debug_(dir(field))
-            # debug_((getattr(instance, field.name), field.related_model, field.__class__.__name__))
-            ...
-            # n += field.many_to_many
-            # if n: n += 'many to many'
-            # elif field.many_to_one:
-            #     n += 'many to one'
-            # elif field.one_to_one: n += 'one to one'
-            # elif field.one_to_many: n += f'one to many'
-            # n += '\n'
-            # n += f'"name": "{field.name}"\n"rel_class": "{n}"\n"classname": {field.__class__.__name__}'
+
     instance.save()
-    # debug_(field.related_model.objects.get(id=id))
-
-
-
-    # allowed_field_names = {
-    #     f.name for f in instance._meta.get_fields()
-    #     if is_simple_editable_field(f)
-    # }
-
-    # for attr, val in attrs.items():
-    #     if attr in allowed_field_names:
-    #         setattr(instance, attr, val)
-
-    # if commit:
-    #     instance.save()
-
 
 
 
