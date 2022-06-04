@@ -9,6 +9,7 @@ from django.forms.models import model_to_dict
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from utils import debug_, subtract_perecnt
+from django.contrib.sessions.backends.db import SessionStore
 from .models import (
     Customer,
     Cart,
@@ -40,8 +41,8 @@ def get_mycontext(request):
     return context
 
 
-class BuyFromCart(View):
-
+class ViewMixin(View):
+    
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         # Try to dispatch to the right method; if a method doesn't exist,
@@ -55,6 +56,9 @@ class BuyFromCart(View):
             handler = self.http_method_not_allowed
         return handler(request, *args, **kwargs)
 
+
+class BuyFromCart(ViewMixin):
+
     def get(self, request):
         debug_("buy_from_cart", "get")
         return HttpResponse('GET result')
@@ -64,7 +68,7 @@ class BuyFromCart(View):
         return HttpResponse('POST result')
 
 
-class BuyDetail(View):
+class BuyDetail(ViewMixin):
 
     def get(self, request):
         debug_("buy_detail", 'get')
@@ -75,7 +79,7 @@ class BuyDetail(View):
         return redirect('cart')
 
 
-class BuyAllCart(View):
+class BuyAllCart(ViewMixin):
 
     def post(self, request):
         context = get_mycontext(request)
@@ -86,11 +90,9 @@ class BuyAllCart(View):
             Order.objects.create(
                 customer=customer,
                 product=product.product,
-                avaiability=product.avaiability,
-            )
+                avaiability=product.avaiability,)
             product.delete()
         order = ''.join([f'<p style="background-color: gray; color: yellow;">{i.product.name}<p>' for i in Order.objects.filter(customer=customer)])
-
         return HttpResponse(f"{order}")
     
     def get(self, request):
@@ -100,8 +102,6 @@ class BuyAllCart(View):
         cart = Cart.objects.filter(user=customer)
         order = ''.join([f'<p style="background-color: gray; color: yellow;">{i.product.name}<p>' for i in Order.objects.filter(customer=customer)])
         return HttpResponse(f"{order}")
-
-        
 
 
 def add_to_order(request):
@@ -195,8 +195,7 @@ def add_to_cart(request):
 
 
 def index(request):
-    debug_(dir(request.session))
-    debug_(request.session.keys)
+
     pr = [i for i in Product.objects.all()]
     cat = Category.objects.all()
     subcat = SubCategory.objects.all()
@@ -339,12 +338,17 @@ def all_users(request):
     context["users"] = User.objects.all()
     return render(request, "store_app/allusers.html", context)
 
+
 # @auth_superuser
 def detail_product(request, my_id):
     context = get_mycontext(request)
     context["title"] = "Detail Product"
-    context["product"] = Product.objects.get(pk=my_id)
-    return render(request, "store_app/detail_product.html", context)
+    try:
+        prd = Product.objects.get(pk=my_id)
+        context["product"] = prd
+        return render(request, "store_app/detail_product.html", context, status=200)
+    except:
+        return HttpResponse('----------------', status=404)
 
 
 def remove_detail(request, my_id):
