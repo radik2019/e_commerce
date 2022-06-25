@@ -27,10 +27,9 @@ from .models import Product, Brand, Category
 import json
 from hashlib import sha256
 from django.views.decorators.csrf import csrf_exempt
-'''
 
 
-'''
+
 class RetrieveRESTViewMixin:
     def get_detail(self, request, pk=None, *args, **kwargs):
         resource = self.model.objects.filter(pk=pk)  # Retrieve
@@ -263,39 +262,17 @@ class ProductViews(RESTView):
     
     @csrf_exempt
     def post(self, request, id=None):
-
+        req_payload = json.loads(request.body)
         if id:
             query_dict = Product.objects.filter(pk=id)
             if len(query_dict) == 0:
                 return JsonResponse({"error 404": "prodotto ineststente"}, safe=False, status=204)
             prod = query_dict[0]
-            prod.name = prod.name.upper()
-            prod.save()
-            # allowed_field_names = {
-            #     f.name for f in prod._meta.get_fields()
-            #     if is_simple_editable_field(f)
-            # }
-            lst = [fil for fil in prod._meta.get_fields()]
-            for i in lst:
-                if not i.is_relation:
-                    debug_(f'{i.name}, is_relation: {i.is_relation}, is_editable: {i.editable}, is_ID: {i.primary_key}')
-                else:
-                    
-                    n = i.many_to_many
-                    if n: n= 'many to many'
-                    elif i.many_to_one:
-                        n= 'many to one'
-                        # debug_(dir(i))
-                    elif i.one_to_one: n= 'one to one'
-                    elif i.one_to_many: n = 'one to many'
+            req_payload = json.loads(request.body)
+            pr = Product.objects.get(pk=id)
+            update_from_dict(pr, req_payload)
 
-
-                    debug_(f'---->   {i.model}    {i.name} not_relation , rel_class: {n},')
-
-
-
-
-            return JsonResponse({'asdasd': 'jhgjhgj'}, safe=False)
+            return JsonResponse({'file': 'Modificato'}, safe=False)
         debug_('POST Create Products')
         sr = {"method": "Post request"}
 
@@ -303,22 +280,27 @@ class ProductViews(RESTView):
 
 
 
-def is_simple_editable_field(field):
-    return (
-            field.editable
-            and not field.primary_key
-            and not isinstance(field, (ForeignObjectRel, RelatedField))
-    )
+def update_from_dict(instance, req_payload: dict):
+    """Prende un'istanza di un modello e la"""
+    # SI ITERA INSTANZA PER OGNI FIELD
+    for field in instance._meta.get_fields():
 
-def update_from_dict(instance, attrs, commit):
-    allowed_field_names = {
-        f.name for f in instance._meta.get_fields()
-        if is_simple_editable_field(f)
-    }
+        # SE IL NOME DEL FIELD C'E` NELLA req_payload
+        if field.name in req_payload:
 
-    for attr, val in attrs.items():
-        if attr in allowed_field_names:
-            setattr(instance, attr, val)
+            # se il field e` un relation field e non e` un primary key
+            if field.is_relation and not field.primary_key:
 
-    if commit:
-        instance.save()
+                # si crea l'istanza del field relazionale
+                field_instance = field.related_model.objects.get(id=req_payload[field.name])
+                setattr(instance, field.name, field_instance)
+
+            elif not field.is_relation and not field.primary_key:
+                setattr(instance, field.name, req_payload[field.name])
+
+    instance.save()
+
+
+
+
+
