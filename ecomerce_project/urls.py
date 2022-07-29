@@ -28,7 +28,7 @@ urlpatterns = [
     path('buydetail/', BuyDetail.as_view(), name="buydetail"),
     path('buyallcart/', BuyAllCart.as_view(), name="buyallcart"),
 
-
+    path('myaccount/', MyAccount.as_view(), name="myaccount"),
 
     path('api/', include('store_app.urls')),
     # ... snip ...

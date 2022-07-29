@@ -1,6 +1,8 @@
+
+
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth import logout
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout, authenticate, login
+
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
@@ -45,6 +47,7 @@ class ViewMixin(View):
     
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
+        debug_(args, kwargs)
         # Try to dispatch to the right method; if a method doesn't exist,
         # defer to the error handler. Also defer to the error handler if the
         # request method isn't on the approved list.
@@ -55,6 +58,22 @@ class ViewMixin(View):
         else:
             handler = self.http_method_not_allowed
         return handler(request, *args, **kwargs)
+
+
+class MyAccount(ViewMixin):
+
+    def password_modifier(self, request, new_password):
+        usr = Customer.objects.get(user=request.user)
+        usr.user.set_password(new_password)
+        usr.user.save()
+
+    def get(self, request):
+        usr = Customer.objects.get(user=request.user)
+
+        return render(request, 'store_app/user_account.html', get_mycontext(request))
+
+    def post(self, request):
+        return HttpResponse('My Account POST result')
 
 
 class BuyFromCart(ViewMixin):
@@ -170,7 +189,6 @@ def add_to_cart(request):
         context["cart_dicounted_summ"] = sum([i.get_discounted_sum for i in cart])
         context["cart"] = cart
         if request.method == "POST":
-            debug_(request.POST.dict())
             if not request.POST.get("avaiability"):
                 context["message"] = "Seleziona la quantita` da aggiungere"
                 return render(request, 'store_app/message.html', context)
@@ -195,7 +213,6 @@ def add_to_cart(request):
 
 
 def index(request):
-
     pr = [i for i in Product.objects.all()]
     cat = Category.objects.all()
     subcat = SubCategory.objects.all()
@@ -360,3 +377,6 @@ def remove_detail(request, my_id):
         context['message'] = "prodotto inesistente"
         render(request, "store_app/message.html", context)
     return render(request, "store_app/message.html", context)
+
+
+

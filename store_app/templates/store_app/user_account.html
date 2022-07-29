@@ -1,0 +1,61 @@
+{% extends "store_app/base.html" %}
+{% block content %}
+    <h2 style="text-align:center;"> My account </h2>
+    
+    my account manager
+    <br>
+    Name: {{ user.username }}
+    <br>
+    Email: {{ user.email}}
+    <br>
+
+
+    {% if user.is_superuser %}
+  <form method="POST" action="{% url 'registersuperuser' %}" >
+{% else %}
+  <form method="POST" action="{% url 'register' %}" >
+{% endif %}
+    {% csrf_token %}
+    <br><br>
+    
+    <div class="row-5 mb-4 ">
+        <div class="col-sm-10">
+                <input name="username" type="text" class="form-control" placeholder="{{ user.username }}">
+        </div>
+    </div>
+                    
+    <div class="row-5 mb-4 ">
+      <div class="col-sm-10">
+              <input name="name" type="text" class="form-control" placeholder="{{ user.name }}">
+      </div>
+    </div>
+            
+    <div class="row-5 mb-4 ">
+      <div class="col-sm-10">
+              <input name="debt_card" type="text" class="form-control" placeholder="{{ user.debt_card }}">
+      </div>
+    </div>
+
+
+    <div class="row-8 mb-4">
+      <div class="col-sm-10">
+        <input name="email" type="email" class="form-control" id="inputEmail3" placeholder="{{ user.email }}">
+      </div>
+    </div>
+
+    <div class="row-8 mb-4">
+      <div class="col-sm-10">
+        <input type="password" class="form-control" id="inputPassword3" name="password1" placeholder="Password *">
+      </div>
+    </div>
+
+    <div class="row-8 mb-4">
+            <div class="col-sm-10">
+              <input type="password" class="form-control" id="inputPassword3" name="password2" placeholder="Repeat password *">
+            </div>
+          </div>
+
+    <button type="submit" class="btn btn-primary">Modifica</button>
+  </form>
+    
+{% endblock %}

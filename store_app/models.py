@@ -23,8 +23,7 @@ class Customer(models.Model):
             'username': self.user.username,
             'name': self.name,
             'debt_card': self.debt_card,
-            'email': self.user.email,
-            'password': self.user.password
+            'email': self.user.email
         }
         return dct
 

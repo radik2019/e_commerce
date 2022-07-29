@@ -3,7 +3,7 @@
 
     {% if auth %}
     <br><br>
-    <h2 class="position-absolute top-40 start-50 translate-middle">Lista dei dati</h2>
+    <h2 class="position-absolute top-40 start-50 translate-middle">* Lista dei  dati *</h2>
     <br><br>
         <table class="table table-striped table-hover">
             <thead>
@@ -21,7 +21,7 @@
             <tbody>
                 {% for i in pr %}
                     {% if i.avaiability == 0 and not is_staff %}
-                    {% comment %} hgjhgj {% endcomment %}
+                    fdkhgjdkjhfgkdjhfkjhfgkdfhjgkjhd----------------
                     {% else %}
 
                         {% if i.discount == 0 %}
@@ -44,7 +44,7 @@
                         <td>{{ i.sub_cat.name }}</td>
                         <td>{{ i.avaiability }}</td>
                         <td>{{ i.discount }}</td>
-                        <td >{{ i.price }}</td>
+                        <td>{{ i.price }}</td>
                         <td>{{ i.discounted_price }}</td>
                         </tr>
                     {% endif %}
