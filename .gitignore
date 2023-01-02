@@ -81,6 +81,9 @@ docs/_build/
 # PyBuilder
 target/
 
+## images
+*.jpg
+*.png
 
 ### Django ###
 *.log
